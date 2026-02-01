@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  
+  <!-- iOS Specific Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Budget">
+  
+  <!-- Theme Color -->
+  <meta name="theme-color" content="#4F46E5">
+  
+  <!-- iOS Icons -->
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%234F46E5'/%3E%3Cpath d='M50 60h80v10H50z M50 80h80v10H50z M50 100h80v10H50z M50 120h80v10H50z' fill='white'/%3E%3C/svg%3E">
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="./pwa-manifest.json">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%234F46E5'/%3E%3Cpath d='M30 35h40v5H30z M30 45h40v5H30z M30 55h40v5H30z M30 65h40v5H30z' fill='white'/%3E%3C/svg%3E">
+  
+  <title>Budget Tracker</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- React & ReactDOM -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  
+  <!-- Babel Standalone for JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  
+  <style>
+    /* iOS Safe Area Support */
+    :root {
+      --safe-area-inset-top: env(safe-area-inset-top);
+      --safe-area-inset-right: env(safe-area-inset-right);
+      --safe-area-inset-bottom: env(safe-area-inset-bottom);
+      --safe-area-inset-left: env(safe-area-inset-left);
+    }
+    
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overscroll-behavior-y: none;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: pan-y;
+    }
+    
+    /* Prevent pull-to-refresh on iOS */
+    body {
+      overflow-x: hidden;
+      position: fixed;
+      width: 100%;
+      height: 100%;
+    }
+    
+    #root {
+      width: 100%;
+      height: 100%;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    
+    /* iOS Button Fix */
+    button {
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    
+    input, select, textarea {
+      font-size: 16px !important; /* Prevents iOS zoom on input focus */
+    }
+    
+    /* Safe area padding */
+    .safe-top {
+      padding-top: max(env(safe-area-inset-top), 0.75rem);
+    }
+    
+    .safe-bottom {
+      padding-bottom: max(env(safe-area-inset-bottom), 1rem);
+    }
+    
+    .pb-safe {
+      padding-bottom: max(env(safe-area-inset-bottom), 1rem);
+    }
+    
+    /* Smooth scrolling */
+    * {
+      -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Active states for mobile */
+    .active\:scale-95:active {
+      transform: scale(0.95);
+    }
+    
+    /* Hide scrollbar but keep functionality */
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .hide-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  
+  <!-- Your Budget Tracker Component -->
+  <script type="text/babel" src="./budget-tracker.jsx"></script>
+  
+  <!-- Service Worker for PWA -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(registration => console.log('SW registered'))
+          .catch(err => console.log('SW registration failed'));
+      });
+    }
+    
+    // Prevent iOS bounce effect
+    document.body.addEventListener('touchmove', function(e) {
+      if (e.target.closest('.overflow-y-auto') || e.target.closest('.overflow-x-auto')) {
+        return;
+      }
+      e.preventDefault();
+    }, { passive: false });
+    
+    // Handle iOS keyboard
+    window.addEventListener('resize', () => {
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
+    });
+  </script>
+</body>
+</html>
